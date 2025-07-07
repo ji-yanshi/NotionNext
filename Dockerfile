@@ -6,11 +6,12 @@ FROM node:20-alpine AS base
 # 1. Install dependencies only when needed
 FROM base AS deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+# 添加构建工具和 Python，以支持原生模块编译
+RUN apk add --no-cache libc6-compat build-base python3
 WORKDIR /app
 COPY package.json ./
 
-# !!! 修复：启用 Corepack 并使用 pnpm 安装依赖 !!!
+# 启用 Corepack 并使用 pnpm 安装依赖
 RUN corepack enable && pnpm install --frozen-lockfile
 
 # 2. Rebuild the source code only when needed
