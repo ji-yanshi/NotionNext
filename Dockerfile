@@ -9,7 +9,9 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json ./
-RUN corepack enable && yarn install --frozen-lockfile
+
+# !!! 修复：启用 Corepack 并使用 pnpm 安装依赖 !!!
+RUN corepack enable && pnpm install --frozen-lockfile
 
 # 2. Rebuild the source code only when needed
 FROM base AS builder
@@ -18,9 +20,11 @@ ENV NEXT_BUILD_STANDALONE=true
 
 WORKDIR /app
 
+# 注意：如果 pnpm 安装的 node_modules 结构与 yarn 不同，可能需要调整 COPY 路径
+# 通常 pnpm 会在项目根目录创建 node_modules/.pnpm，但标准情况下仍然是 node_modules
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN yarn build
+RUN pnpm build # 如果项目使用 pnpm，这里也可能需要改为 pnpm build
 
 # 3. Production image, copy all the files and run next
 FROM base AS runner
