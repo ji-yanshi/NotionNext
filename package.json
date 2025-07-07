@@ -28,6 +28,7 @@
   "dependencies": {
     "@clerk/localizations": "^3.0.4",
     "@clerk/nextjs": "^5.1.5",
+    "@fisch0920/medium-zoom": "^1.0.7",
     "@headlessui/react": "^1.7.15",
     "@next/bundle-analyzer": "^12.1.1",
     "@vercel/analytics": "^1.0.0",
@@ -36,11 +37,15 @@
     "feed": "^4.2.2",
     "ioredis": "^5.4.2",
     "js-md5": "^0.7.3",
+    "katex": "^0.16.22",
+    "lodash": "^4.17.21",
     "lodash.throttle": "^4.1.1",
     "memory-cache": "^0.2.0",
     "next": "14.2.4",
     "notion-client": "7.3.0",
     "notion-utils": "7.3.0",
+    "prismjs": "^1.30.0",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-facebook": "^8.1.4",
@@ -78,5 +83,6 @@
   "bugs": {
     "url": "https://github.com/tangly/NotionNext/issues",
     "email": "tlyong1992@hotmail.com"
-  }
+  },
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"
 }
