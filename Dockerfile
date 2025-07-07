@@ -3,18 +3,18 @@ ARG NEXT_PUBLIC_THEME
 
 FROM node:20-alpine AS base
 
+# ✅ 安装构建工具和 pnpm（全局方式更稳定）
+RUN apk add --no-cache libc6-compat build-base python3 \
+    && npm install -g pnpm
+
+WORKDIR /app
+
 # 1. Install dependencies only when needed
 FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-# 添加构建工具和 Python，以支持原生模块编译
-RUN apk add --no-cache libc6-compat build-base python3
-WORKDIR /app
 COPY package.json ./
 
-# 启用 Corepack 并使用 pnpm 安装依赖
 # !!! 修复：由于 ERR_PNPM_LOCKFILE_CONFIG_MISMATCH 错误，暂时移除 --frozen-lockfile
-# 最佳实践是在本地运行 "pnpm install --no-frozen-lockfile" 更新 lockfile 并提交
-RUN corepack enable && pnpm install
+RUN pnpm install
 
 # 2. Rebuild the source code only when needed
 FROM base AS builder
@@ -23,11 +23,11 @@ ENV NEXT_BUILD_STANDALONE=true
 
 WORKDIR /app
 
-# 注意：如果 pnpm 安装的 node_modules 结构与 yarn 不同，可能需要调整 COPY 路径
-# 通常 pnpm 会在项目根目录创建 node_modules/.pnpm，但标准情况下仍然是 node_modules
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm build # 如果项目使用 pnpm，这里也可能需要改为 pnpm build
+
+# ✅ 使用全局安装的 pnpm 构建
+RUN pnpm build
 
 # 3. Production image, copy all the files and run next
 FROM base AS runner
@@ -42,14 +42,12 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# 个人仓库把将配置好的.env.local文件放到项目根目录，可自动使用环境变量
+# 若使用本地环境变量文件
 # COPY --from=builder /app/.env.local ./
 
 EXPOSE 3000
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry.
+# 禁用 Next.js 远程收集（可选）
 # ENV NEXT_TELEMETRY_DISABLED 1
 
 CMD ["node", "server.js"]
