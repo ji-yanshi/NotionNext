@@ -9,7 +9,7 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json ./
-RUN yarn install --frozen-lockfile
+corepack enable && RUN yarn install --frozen-lockfile
 
 # 2. Rebuild the source code only when needed
 FROM base AS builder
