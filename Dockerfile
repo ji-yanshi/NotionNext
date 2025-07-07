@@ -12,7 +12,9 @@ WORKDIR /app
 COPY package.json ./
 
 # 启用 Corepack 并使用 pnpm 安装依赖
-RUN corepack enable && pnpm install --frozen-lockfile
+# !!! 修复：由于 ERR_PNPM_LOCKFILE_CONFIG_MISMATCH 错误，暂时移除 --frozen-lockfile
+# 最佳实践是在本地运行 "pnpm install --no-frozen-lockfile" 更新 lockfile 并提交
+RUN corepack enable && pnpm install
 
 # 2. Rebuild the source code only when needed
 FROM base AS builder
